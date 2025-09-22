@@ -127,7 +127,7 @@ export default function Home() {
               Trusted by 400+ Revenue Leaders
             </Badge>
 
-            <h1 className="sm:text-6xl md:text-8xl text-4xl font-bold text-white/90 tracking-tighter font-space-grotesk mix-blend-hard-light drop-shadow-2xl" style="">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl leading-[0.95] text-white font-bold tracking-tighter">
               Close More 
               <span className="font-bold text-blue-300 tracking-tighter"> Enterprise Deals</span> with Quantified Value Stories
             </h1>
