@@ -1,1251 +1,836 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowRight, Play, ChevronDown, Calculator, Shield, TrendingUp, Users, Zap, BarChart3, CheckCircle, Star, Quote, Lock, Award, Clock, DollarSign, Target, Briefcase, ChevronRight, Building2, Globe } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
+import { 
+  Sparkles, 
+  Calculator, 
+  TrendingUp, 
+  Shield, 
+  Users, 
+  Clock,
+  CheckCircle,
+  ArrowRight,
+  Play,
+  BarChart3,
+  Target,
+  Zap,
+  Building,
+  Star,
+  Menu,
+  Bot,
+  MessageSquare,
+  Code,
+  GitPullRequest,
+  Brain,
+  Lock,
+  Gauge,
+  CreditCard,
+  ArrowUpRight
+} from 'lucide-react';
 
 export default function Home() {
-  const [roiData, setRoiData] = useState({
-    currentRevenue: 10000000,
-    targetGrowth: 25,
-    dealSize: 50000,
-    salesCycle: 6,
-    winRate: 20
-  });
-
-  const [calculatedROI, setCalculatedROI] = useState({
-    paybackWeeks: 3.4,
-    revenueIncrease: 17,
-    dealVelocity: 28,
-    netRoi: 340,
-    timeToValue: 30,
-    dealsSaved: 8.3
-  });
-
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
+  const [arrTarget, setArrTarget] = useState([5000000]);
+  const [dealSize, setDealSize] = useState([50000]);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const testimonials = [
     {
-      company: "CloudSync Technologies",
-      logo: "☁️",
-      person: "Sarah Chen, CFO",
-      title: "Chief Financial Officer",
-      photo: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      quote: "B2BValue cut our deal approval time from 3 weeks to 2 days. The ROI models are so precise, our board approved a 40% larger software budget.",
-      metrics: "67% faster deal approvals",
-      industry: "Cloud Infrastructure",
-      companySize: "Series C",
-      specificResult: "Approved $2.3M additional software spend based on quantified value cases"
+      quote: "ValueArch helped us close 14 additional enterprise deals worth $4.2M in Q4. The ROI calculator alone saved our sales team 15 hours per week.",
+      author: "Sarah Chen",
+      title: "VP of Sales",
+      company: "CloudScale",
+      avatar: "https://images.unsplash.com/photo-1494790108755-2616b5c1c6dd?w=60&h=60&fit=crop&crop=face"
     },
     {
-      company: "SecureVault Systems",
-      logo: "🔐",
-      person: "Marcus Rodriguez, Chief Revenue Officer",
-      title: "Chief Revenue Officer", 
-      photo: "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      quote: "Our win rate jumped 23 percentage points after implementing B2BValue. Prospects literally sell themselves when they see their projected ROI.",
-      metrics: "+23pp enterprise win rate",
-      industry: "Cybersecurity",
-      companySize: "Series B",
-      specificResult: "Closed 14 additional enterprise deals worth $4.2M in Q4 alone"
+      quote: "Before ValueArch, our renewal conversations were guesswork. Now we show customers exactly why they're seeing 340% ROI, and our NRR jumped to 142%.",
+      author: "Marcus Rodriguez",
+      title: "Chief Customer Officer",
+      company: "DataFlow Inc",
+      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face"
     },
     {
-      company: "DataFlow Analytics",
-      logo: "📊",
-      person: "Dr. Elena Petrov, VP of Customer Success",
-      title: "VP Customer Success",
-      photo: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop",
-      quote: "Renewal conversations became partnerships. When customers see their realized value tracked monthly, expansion becomes inevitable.",
-      metrics: "+156% net revenue retention",
-      industry: "Business Intelligence",
-      companySize: "Post-Series A",
-      specificResult: "Achieved 156% NRR, up from 98% before implementing value tracking"
+      quote: "The AI-powered business case generation is incredible. What used to take our analysts 3 days now happens in 30 minutes, with better insights.",
+      author: "Emily Watson",
+      title: "Head of Revenue Operations",
+      company: "TechForward",
+      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&crop=face"
     }
-  ];
-
-  const customerLogos = [
-    { name: "CloudSync", logo: "☁️", industry: "Cloud Infrastructure" },
-    { name: "SecureVault", logo: "🔐", industry: "Cybersecurity" },
-    { name: "DataFlow", logo: "📊", industry: "Analytics" },
-    { name: "FinanceFlow", logo: "💰", industry: "FinTech" },
-    { name: "ScaleUp", logo: "📈", industry: "Growth Platform" },
-    { name: "InnovateCorp", logo: "💡", industry: "Product Innovation" },
-    { name: "TechFlow", logo: "🚀", industry: "DevOps" },
-    { name: "BuildRight", logo: "🏗️", industry: "Construction Tech" }
-  ];
-
-  const trustIndicators = [
-    { label: "SOC 2 Type II", icon: Shield, color: "text-blue-600" },
-    { label: "ISO 27001", icon: Lock, color: "text-green-600" },
-    { label: "GDPR Compliant", icon: Globe, color: "text-purple-600" },
-    { label: "99.9% Uptime SLA", icon: Award, color: "text-orange-600" }
   ];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 6000);
+      setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+    }, 4000);
     return () => clearInterval(interval);
-  }, []);
+  }, [testimonials.length]);
 
-  useEffect(() => {
-    // Enhanced ROI calculations with more realistic modeling
-    const basePayback = Math.max(0.8, 8 - (roiData.targetGrowth / 15));
-    const revenueGains = Math.min(45, 8 + (roiData.targetGrowth * 0.6) + (roiData.winRate * 0.4));
-    const velocityGains = Math.min(55, 12 + (roiData.winRate * 0.7) + (roiData.targetGrowth * 0.3));
-    const netRoiCalc = Math.floor(revenueGains * 6 + roiData.targetGrowth * 2.8);
-    const timeToValueCalc = Math.max(14, 45 - (roiData.targetGrowth * 0.8));
-    const dealsSavedCalc = (roiData.currentRevenue / 1000000) * (revenueGains / 100) * 0.7;
-
-    setCalculatedROI({
-      paybackWeeks: Number(basePayback.toFixed(1)),
-      revenueIncrease: Math.floor(revenueGains),
-      dealVelocity: Math.floor(velocityGains),
-      netRoi: netRoiCalc,
-      timeToValue: Math.floor(timeToValueCalc),
-      dealsSaved: Number(dealsSavedCalc.toFixed(1))
-    });
-  }, [roiData]);
+  const paybackWeeks = Math.round((2799 * 12) / ((arrTarget[0] * 0.17) / 52));
+  const additionalRevenue = Math.round(arrTarget[0] * 0.17);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="antialiased bg-gray-950 text-white min-h-screen" style={{fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial'}}>
+      {/* Background */}
+      <div className="absolute top-0 w-full -z-10 h-[800px] blur-3xl bg-cover bg-center opacity-30" 
+           style={{backgroundImage: 'url("https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=3840&h=800&fit=crop")'}}></div>
+
       {/* Navigation */}
-      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-8">
-              <div className="flex items-center space-x-3">
-                <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-sm">
-                  <BarChart3 className="w-5 h-5 text-white" />
+      <header className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-4xl px-6">
+        <div className="bg-gray-900/80 border-gray-800 border rounded-full shadow-[0_2.8px_2.2px_rgba(0,_0,_0,_0.034),_0_6.7px_5.3px_rgba(0,_0,_0,_0.048),_0_12.5px_10px_rgba(0,_0,_0,_0.06),_0_22.3px_17.9px_rgba(0,_0,_0,_0.072),_0_41.8px_33.4px_rgba(0,_0,_0,_0.086),_0_100px_80px_rgba(0,_0,_0,_0.12)] backdrop-blur-xl">
+          <div className="flex pt-3 pr-4 pb-3 pl-6 items-center justify-between">
+            {/* Logo */}
+            <a href="#" className="inline-flex items-center justify-center text-white font-bold text-xl">
+              ValueArch
+            </a>
+
+            <nav className="hidden md:flex items-center gap-6">
+              <a href="#" className="hover:text-white/70 text-sm font-medium text-white/90">Platform</a>
+              <a href="#" className="hover:text-white/70 text-sm font-medium text-white/90">Solutions</a>
+              <a href="#" className="hover:text-white/70 text-sm font-medium text-white/90">Customers</a>
+              <a href="#" className="hover:text-white/70 text-sm font-medium text-white/90">Pricing</a>
+            </nav>
+
+            <div className="hidden md:flex gap-3 items-center">
+              <a href="#" className="hover:text-white/60 text-sm font-medium text-white/80">Sign in</a>
+              <button type="button" className="button">
+                <div className="points_wrapper">
+                  {[...Array(10)].map((_, i) => (
+                    <i key={i} className="point"></i>
+                  ))}
                 </div>
-                <span className="text-xl font-bold text-gray-900">B2BValue</span>
-              </div>
-              <div className="hidden md:flex space-x-6">
-                <a href="#platform" className="text-gray-600 hover:text-gray-900 transition-colors font-medium">Platform</a>
-                <a href="#solutions" className="text-gray-600 hover:text-gray-900 transition-colors font-medium">Solutions</a>
-                <a href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors font-medium">Pricing</a>
-                <a href="#customers" className="text-gray-600 hover:text-gray-900 transition-colors font-medium">Customers</a>
-                <a href="#security" className="text-gray-600 hover:text-gray-900 transition-colors font-medium">Security</a>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Button variant="ghost" className="hidden md:inline-flex font-medium">Sign In</Button>
-              <Button className="bg-blue-600 hover:bg-blue-700 font-semibold shadow-sm">
-                Start Free Trial
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-blue-50/30 py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
-            <div className="mb-12 lg:mb-0">
-              {/* Trust Signal Badge */}
-              <div className="flex items-center space-x-2 mb-6">
-                <Badge className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
-                  <TrendingUp className="w-3 h-3 mr-1" />
-                  Trusted by 400+ B2B SaaS leaders
-                </Badge>
-                <Badge className="bg-blue-50 text-blue-700 border-blue-200 px-3 py-1">
-                  <BarChart3 className="w-3 h-3 mr-1" />
-                  $8.7B in pipeline proven
-                </Badge>
-              </div>
-
-              {/* Primary Value Proposition */}
-              <h1 className="text-4xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                Close 23% More Enterprise Deals with{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-700">
-                  Quantified Value Stories
+                <span className="inner">
+                  Book Demo
+                  <ArrowRight className="w-4 h-4" />
                 </span>
-              </h1>
-              
-              {/* Supporting Subheadline */}
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                B2BValue transforms your sales conversations into board-ready business cases that buyers can't ignore. 
-                Build ROI models, track value realization, and automate renewal justification—all in under 30 minutes.
-              </p>
-
-              {/* Primary CTA Section */}
-              <div className="flex flex-col sm:flex-row gap-4 mb-10">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-4 font-semibold shadow-md">
-                  Start Your 14-Day Free Trial
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-                <Dialog open={isCalculatorOpen} onOpenChange={setIsCalculatorOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="lg" variant="outline" className="text-lg px-8 py-4 border-gray-300 hover:border-gray-400 font-semibold">
-                      <Calculator className="mr-2 w-5 h-5" />
-                      Calculate Your ROI
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-3xl">
-                    <DialogHeader>
-                      <DialogTitle className="text-2xl">ROI Impact Calculator</DialogTitle>
-                      <DialogDescription className="text-lg">
-                        See your projected results with B2BValue based on your current metrics
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-8 py-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                          <div>
-                            <Label className="text-base font-medium">Current ARR ($M)</Label>
-                            <Input
-                              type="number"
-                              value={roiData.currentRevenue / 1000000}
-                              onChange={(e) => setRoiData({...roiData, currentRevenue: Number(e.target.value) * 1000000})}
-                              className="mt-2 text-lg"
-                              min="0.1"
-                              step="0.1"
-                            />
-                          </div>
-                          <div>
-                            <Label className="text-base font-medium">Growth Target (%)</Label>
-                            <div className="mt-3">
-                              <Slider
-                                value={[roiData.targetGrowth]}
-                                onValueChange={(value) => setRoiData({...roiData, targetGrowth: value[0]})}
-                                max={100}
-                                step={5}
-                                className="w-full"
-                              />
-                              <div className="text-sm text-gray-500 mt-2 text-center">{roiData.targetGrowth}% annual growth</div>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="space-y-4">
-                          <div>
-                            <Label className="text-base font-medium">Average Deal Size ($K)</Label>
-                            <Input
-                              type="number"
-                              value={roiData.dealSize / 1000}
-                              onChange={(e) => setRoiData({...roiData, dealSize: Number(e.target.value) * 1000})}
-                              className="mt-2 text-lg"
-                              min="1"
-                              step="1"
-                            />
-                          </div>
-                          <div>
-                            <Label className="text-base font-medium">Current Win Rate (%)</Label>
-                            <div className="mt-3">
-                              <Slider
-                                value={[roiData.winRate]}
-                                onValueChange={(value) => setRoiData({...roiData, winRate: value[0]})}
-                                max={60}
-                                step={1}
-                                className="w-full"
-                              />
-                              <div className="text-sm text-gray-500 mt-2 text-center">{roiData.winRate}% win rate</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Results Display */}
-                      <div className="bg-gradient-to-br from-blue-50 to-green-50 p-8 rounded-xl border border-blue-100">
-                        <h3 className="font-bold text-xl mb-6 text-center text-gray-900">Your Projected Results with B2BValue</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                          <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                            <div className="text-3xl font-bold text-blue-600">{calculatedROI.paybackWeeks}</div>
-                            <div className="text-sm text-gray-600 mt-1">Weeks to Payback</div>
-                          </div>
-                          <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                            <div className="text-3xl font-bold text-green-600">+{calculatedROI.revenueIncrease}%</div>
-                            <div className="text-sm text-gray-600 mt-1">Win Rate Increase</div>
-                          </div>
-                          <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                            <div className="text-3xl font-bold text-purple-600">+{calculatedROI.dealVelocity}%</div>
-                            <div className="text-sm text-gray-600 mt-1">Faster Sales Cycles</div>
-                          </div>
-                          <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                            <div className="text-3xl font-bold text-orange-600">{calculatedROI.netRoi}%</div>
-                            <div className="text-sm text-gray-600 mt-1">12-Month ROI</div>
-                          </div>
-                          <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                            <div className="text-3xl font-bold text-red-600">{calculatedROI.timeToValue}</div>
-                            <div className="text-sm text-gray-600 mt-1">Days to First Win</div>
-                          </div>
-                          <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                            <div className="text-3xl font-bold text-indigo-600">{calculatedROI.dealsSaved}</div>
-                            <div className="text-sm text-gray-600 mt-1">Extra Deals/Year</div>
-                          </div>
-                        </div>
-                        <div className="mt-6 text-center">
-                          <Button onClick={() => setIsCalculatorOpen(false)} className="bg-blue-600 hover:bg-blue-700">
-                            Start Free Trial to Achieve These Results
-                            <ArrowRight className="ml-2 w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              {/* Trust Indicators */}
-              <div className="text-sm text-gray-500 mb-8">
-                No credit card required • Full platform access • Enterprise security included
-              </div>
-              
-              {/* Key Performance Metrics */}
-              <div className="grid grid-cols-3 gap-6 text-center">
-                <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
-                  <div className="text-2xl font-bold text-blue-600">+23pp</div>
-                  <div className="text-sm text-gray-600 mt-1">Avg Win Rate Lift</div>
-                </div>
-                <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
-                  <div className="text-2xl font-bold text-green-600">3.4 wks</div>
-                  <div className="text-sm text-gray-600 mt-1">ROI Payback Period</div>
-                </div>
-                <div className="p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
-                  <div className="text-2xl font-bold text-purple-600">156%</div>
-                  <div className="text-sm text-gray-600 mt-1">Avg Net Revenue Retention</div>
-                </div>
-              </div>
+              </button>
             </div>
 
-            {/* Hero Visual/Product Demo */}
-            <div className="relative">
-              <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 border border-gray-100 shadow-2xl">
-                <div className="bg-white rounded-xl p-6 shadow-lg">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="font-semibold text-gray-900 text-lg">Live Business Case Builder</h3>
-                    <Badge className="bg-green-100 text-green-700 px-3 py-1">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                      Live Demo
-                    </Badge>
-                  </div>
-                  
-                  {/* Mock Dashboard */}
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                      <span className="text-sm text-gray-600">Revenue Impact (3 years)</span>
-                      <span className="font-bold text-green-600">+$3.2M</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className="bg-green-500 h-3 rounded-full w-4/5 relative">
-                        <div className="absolute right-0 top-0 w-3 h-3 bg-green-600 rounded-full"></div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                      <span className="text-sm text-gray-600">Cost Reduction</span>
-                      <span className="font-bold text-blue-600">$680K</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className="bg-blue-500 h-3 rounded-full w-3/5 relative">
-                        <div className="absolute right-0 top-0 w-3 h-3 bg-blue-600 rounded-full"></div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                      <span className="text-sm text-gray-600">Risk Mitigation Value</span>
-                      <span className="font-bold text-purple-600">$1.5M</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className="bg-purple-500 h-3 rounded-full w-3/4 relative">
-                        <div className="absolute right-0 top-0 w-3 h-3 bg-purple-600 rounded-full"></div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-6 pt-4 border-t border-gray-100">
-                    <div className="flex justify-between items-center">
-                      <span className="font-bold text-gray-900 text-lg">Total Business Value</span>
-                      <span className="text-3xl font-bold text-blue-600">$5.38M</span>
-                    </div>
-                    <div className="text-sm text-gray-500 mt-2">ROI: 340% over 36 months</div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Floating Trust Elements */}
-              <div className="absolute -top-4 -right-4 bg-white rounded-lg shadow-lg p-3 border border-gray-100">
-                <div className="flex items-center space-x-2">
-                  <Shield className="w-4 h-4 text-green-500" />
-                  <span className="text-sm font-medium">SOC 2 Certified</span>
-                </div>
-              </div>
-              <div className="absolute -bottom-4 -left-4 bg-white rounded-lg shadow-lg p-3 border border-gray-100">
-                <div className="flex items-center space-x-2">
-                  <Clock className="w-4 h-4 text-blue-500" />
-                  <span className="text-sm font-medium">30 min setup</span>
-                </div>
-              </div>
-            </div>
+            <button className="md:hidden inline-flex items-center justify-center rounded-lg border border-gray-800 p-2 text-white/80">
+              <Menu className="w-4 h-4" />
+            </button>
           </div>
         </div>
-      </section>
+      </header>
 
-      {/* Social Proof Marquee */}
-      <section className="bg-gray-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-gray-600 mb-8 text-lg">Trusted by 400+ B2B SaaS leaders managing $8.7B in active pipeline</p>
-          <div className="flex justify-center items-center space-x-8 opacity-70">
-            {customerLogos.map((company, index) => (
-              <div key={index} className="flex items-center space-x-3 text-gray-500 hover:text-gray-700 transition-colors group">
-                <span className="text-2xl group-hover:scale-110 transition-transform">{company.logo}</span>
-                <div className="hidden sm:block">
-                  <div className="font-medium">{company.name}</div>
-                  <div className="text-xs text-gray-400">{company.industry}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Hero */}
+      <section className="relative overflow-hidden pt-24">
+        <div className="max-w-7xl lg:px-8 mx-auto px-6">
+          <div className="sm:pt-16 text-center max-w-4xl mr-auto ml-auto pt-12 pb-48">
+            <Badge className="inline-flex items-center gap-2 text-xs font-medium text-white/90 bg-gray-800/50 border-gray-700 border rounded-full mr-auto mb-4 ml-auto pt-1 pr-3 pb-1 pl-3">
+              <Sparkles className="w-3 h-3" />
+              Trusted by 400+ Revenue Leaders
+            </Badge>
 
-      {/* Platform Features Section */}
-      <section id="platform" className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Three Pillars That Drive Revenue Growth
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Stop leaving money on the table. Our platform transforms how enterprise teams quantify, 
-              track, and expand business value throughout the entire customer lifecycle.
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-8">
-            <Card className="p-8 hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-blue-50 to-blue-100 group">
-              <CardHeader className="pb-6">
-                <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Calculator className="w-7 h-7 text-white" />
-                </div>
-                <CardTitle className="text-2xl text-gray-900 mb-3">Instant Business Case Generation</CardTitle>
-                <CardDescription className="text-gray-700 text-lg leading-relaxed">
-                  Build compelling ROI models that get deals approved faster. Connect to your CRM and financial systems 
-                  to automatically pull real data and generate board-ready business cases in under 30 minutes.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700"><strong>CRM Integration:</strong> Automatically pull deal data from Salesforce, HubSpot, or Pipedrive</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700"><strong>Multi-Scenario Modeling:</strong> Best case, worst case, and most likely outcomes</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700"><strong>Executive Summaries:</strong> AI-generated one-page briefs your CFO will approve</span>
-                  </div>
-                </div>
-                <div className="mt-6 p-4 bg-white rounded-lg border border-blue-200">
-                  <div className="text-sm text-gray-600 mb-2">Typical Results:</div>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div><span className="font-semibold text-green-600">67%</span> faster approvals</div>
-                    <div><span className="font-semibold text-blue-600">23pp</span> win rate lift</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="p-8 hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-green-50 to-green-100 group">
-              <CardHeader className="pb-6">
-                <div className="w-14 h-14 bg-green-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <TrendingUp className="w-7 h-7 text-white" />
-                </div>
-                <CardTitle className="text-2xl text-gray-900 mb-3">Real-Time Value Tracking</CardTitle>
-                <CardDescription className="text-gray-700 text-lg leading-relaxed">
-                  Never lose track of promised value again. Our platform monitors KPIs and automatically 
-                  reports on value realization, giving you the data you need for renewal conversations.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700"><strong>Milestone Monitoring:</strong> Track against promised outcomes with automated alerts</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700"><strong>Stakeholder Dashboards:</strong> Self-service portals for executives and champions</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700"><strong>QBR Automation:</strong> Quarterly business reviews write themselves</span>
-                  </div>
-                </div>
-                <div className="mt-6 p-4 bg-white rounded-lg border border-green-200">
-                  <div className="text-sm text-gray-600 mb-2">Customer Success Impact:</div>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div><span className="font-semibold text-green-600">89%</span> renewal rate</div>
-                    <div><span className="font-semibold text-blue-600">156%</span> avg NRR</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="p-8 hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-purple-50 to-purple-100 group">
-              <CardHeader className="pb-6">
-                <div className="w-14 h-14 bg-purple-600 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Users className="w-7 h-7 text-white" />
-                </div>
-                <CardTitle className="text-2xl text-gray-900 mb-3">Automated Expansion Pipeline</CardTitle>
-                <CardDescription className="text-gray-700 text-lg leading-relaxed">
-                  Turn proven value into expansion revenue. When customers hit their success milestones, 
-                  our platform automatically flags upsell opportunities and builds the business case.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700"><strong>Success Triggers:</strong> Expansion alerts based on value realization thresholds</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700"><strong>Renewal Prep:</strong> Auto-generate renewal decks with realized value proof</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700"><strong>Competitive Defense:</strong> Build switching cost models to protect accounts</span>
-                  </div>
-                </div>
-                <div className="mt-6 p-4 bg-white rounded-lg border border-purple-200">
-                  <div className="text-sm text-gray-600 mb-2">Expansion Results:</div>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div><span className="font-semibold text-green-600">34%</span> upsell rate</div>
-                    <div><span className="font-semibold text-blue-600">2.3x</span> expansion ACV</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Solutions by Role Section */}
-      <section id="solutions" className="bg-gray-50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Purpose-Built for Each Role in the Revenue Engine
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Every stakeholder gets the insights they need, in the format that drives their decisions
-            </p>
-          </div>
-
-          <Tabs defaultValue="cfo" className="max-w-6xl mx-auto">
-            <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="cfo" className="text-lg py-3">Chief Financial Officers</TabsTrigger>
-              <TabsTrigger value="cro" className="text-lg py-3">Chief Revenue Officers</TabsTrigger>
-              <TabsTrigger value="cs" className="text-lg py-3">Customer Success Leaders</TabsTrigger>
-            </TabsList>
+            <h1 className="sm:text-6xl md:text-8xl text-4xl font-bold text-white/90 tracking-tighter mix-blend-hard-light drop-shadow-2xl">
+              Close 23% More 
+              <span className="font-bold text-blue-300 tracking-tighter"> Enterprise Deals</span> with Quantified Value Stories
+            </h1>
             
-            <TabsContent value="cfo" className="mt-8">
-              <Card className="p-8 lg:p-12">
-                <CardHeader className="pb-8">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <DollarSign className="w-6 h-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-3xl text-gray-900">Financial Intelligence & Budget Optimization</CardTitle>
-                      <CardDescription className="text-xl text-gray-600 mt-2">
-                        Transform software purchases into strategic investments with quantified financial models
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid lg:grid-cols-2 gap-8">
-                    <div>
-                      <h4 className="font-semibold text-xl text-gray-900 mb-6">Financial Modeling Capabilities</h4>
-                      <ul className="space-y-4 text-gray-700">
-                        <li className="flex items-start">
-                          <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                          <span><strong>Multi-Year Cash Flow Modeling:</strong> 3-5 year projections with sensitivity analysis</span>
-                        </li>
-                        <li className="flex items-start">
-                          <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                          <span><strong>Risk-Adjusted ROI:</strong> Monte Carlo simulations for conservative planning</span>
-                        </li>
-                        <li className="flex items-start">
-                          <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                          <span><strong>Budget Impact Analysis:</strong> Department-level cost allocation and tracking</span>
-                        </li>
-                        <li className="flex items-start">
-                          <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                          <span><strong>Compliance Reporting:</strong> SOX-ready audit trails for all financial assumptions</span>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="bg-gray-50 p-8 rounded-xl">
-                      <h4 className="font-semibold text-xl text-gray-900 mb-6">Typical CFO Results</h4>
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                          <span className="text-gray-600">Faster Deal Approvals</span>
-                          <span className="font-bold text-2xl text-green-600">+67%</span>
-                        </div>
-                        <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                          <span className="text-gray-600">Budget Forecast Accuracy</span>
-                          <span className="font-bold text-2xl text-blue-600">+43%</span>
-                        </div>
-                        <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                          <span className="text-gray-600">Software ROI Visibility</span>
-                          <span className="font-bold text-2xl text-purple-600">+89%</span>
-                        </div>
-                        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                          <div className="text-sm text-gray-600 mb-1">Average Annual Savings from Better Decisions</div>
-                          <div className="text-2xl font-bold text-blue-600">$1.2M</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="cro" className="mt-8">
-              <Card className="p-8 lg:p-12">
-                <CardHeader className="pb-8">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                      <Target className="w-6 h-6 text-green-600" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-3xl text-gray-900">Revenue Acceleration & Win Rate Optimization</CardTitle>
-                      <CardDescription className="text-xl text-gray-600 mt-2">
-                        Arm your sales team with quantified value propositions that close bigger deals faster
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid lg:grid-cols-2 gap-8">
-                    <div>
-                      <h4 className="font-semibold text-xl text-gray-900 mb-6">Sales Enablement Features</h4>
-                      <ul className="space-y-4 text-gray-700">
-                        <li className="flex items-start">
-                          <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                          <span><strong>Deal-Specific ROI Models:</strong> Customized business cases for each opportunity</span>
-                        </li>
-                        <li className="flex items-start">
-                          <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                          <span><strong>Champion Development Tools:</strong> Equip internal advocates with hard numbers</span>
-                        </li>
-                        <li className="flex items-start">
-                          <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                          <span><strong>Competitive Battle Cards:</strong> Value-based differentiation vs. key competitors</span>
-                        </li>
-                        <li className="flex items-start">
-                          <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                          <span><strong>Pipeline Analytics:</strong> Identify which deals need value justification</span>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="bg-gray-50 p-8 rounded-xl">
-                      <h4 className="font-semibold text-xl text-gray-900 mb-6">Sales Performance Lift</h4>
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                          <span className="text-gray-600">Enterprise Win Rate</span>
-                          <span className="font-bold text-2xl text-green-600">+23pp</span>
-                        </div>
-                        <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                          <span className="text-gray-600">Sales Cycle Velocity</span>
-                          <span className="font-bold text-2xl text-blue-600">+31%</span>
-                        </div>
-                        <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                          <span className="text-gray-600">Average Deal Size</span>
-                          <span className="font-bold text-2xl text-purple-600">+28%</span>
-                        </div>
-                        <div className="mt-6 p-4 bg-green-50 rounded-lg">
-                          <div className="text-sm text-gray-600 mb-1">Additional Quarterly Revenue</div>
-                          <div className="text-2xl font-bold text-green-600">+$3.4M</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="cs" className="mt-8">
-              <Card className="p-8 lg:p-12">
-                <CardHeader className="pb-8">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                      <Briefcase className="w-6 h-6 text-purple-600" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-3xl text-gray-900">Value Realization & Expansion Automation</CardTitle>
-                      <CardDescription className="text-xl text-gray-600 mt-2">
-                        Turn customer success into a revenue multiplier with automated value tracking
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid lg:grid-cols-2 gap-8">
-                    <div>
-                      <h4 className="font-semibold text-xl text-gray-900 mb-6">Success Management Platform</h4>
-                      <ul className="space-y-4 text-gray-700">
-                        <li className="flex items-start">
-                          <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                          <span><strong>Automated Success Milestones:</strong> Track progress against promised outcomes</span>
-                        </li>
-                        <li className="flex items-start">
-                          <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                          <span><strong>Executive QBR Generation:</strong> Quarterly reviews auto-populated with KPIs</span>
-                        </li>
-                        <li className="flex items-start">
-                          <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                          <span><strong>Expansion Opportunity Alerts:</strong> AI identifies upsell/cross-sell moments</span>
-                        </li>
-                        <li className="flex items-start">
-                          <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                          <span><strong>Renewal Risk Mitigation:</strong> Early warning system for at-risk accounts</span>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="bg-gray-50 p-8 rounded-xl">
-                      <h4 className="font-semibold text-xl text-gray-900 mb-6">Customer Success Impact</h4>
-                      <div className="space-y-4">
-                        <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                          <span className="text-gray-600">Net Revenue Retention</span>
-                          <span className="font-bold text-2xl text-green-600">156%</span>
-                        </div>
-                        <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                          <span className="text-gray-600">Gross Renewal Rate</span>
-                          <span className="font-bold text-2xl text-blue-600">94%</span>
-                        </div>
-                        <div className="flex justify-between items-center border-b border-gray-200 pb-2">
-                          <span className="text-gray-600">Expansion Revenue</span>
-                          <span className="font-bold text-2xl text-purple-600">+67%</span>
-                        </div>
-                        <div className="mt-6 p-4 bg-purple-50 rounded-lg">
-                          <div className="text-sm text-gray-600 mb-1">Additional ARR per Account</div>
-                          <div className="text-2xl font-bold text-purple-600">+$89K</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Transparent Pricing That Pays for Itself
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Choose the plan that fits your team size and revenue goals. All plans include full platform access.
+            <p className="sm:text-lg text-base font-normal text-gray-400 mix-blend-screen mt-5 drop-shadow-2xl max-w-3xl mx-auto">
+              ValueArch's AI-powered platform builds compelling business cases in 30 minutes, not 3 days. 
+              Turn every sales conversation into board-ready ROI proof that wins deals and drives renewals.
             </p>
-          </div>
 
-          <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {/* Growth Plan */}
-            <Card className="p-8 hover:shadow-xl transition-all duration-300 relative">
-              <CardHeader className="pb-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-2xl text-gray-900">Growth</CardTitle>
-                    <CardDescription className="text-gray-600 text-lg mt-2">
-                      Perfect for growing teams
-                    </CardDescription>
-                  </div>
-                  <Badge variant="secondary" className="px-3 py-1">Popular</Badge>
-                </div>
-                <div className="mt-6">
-                  <span className="text-5xl font-bold text-gray-900">$1,199</span>
-                  <span className="text-gray-600 text-xl">/month</span>
-                  <div className="text-sm text-gray-500 mt-2">Billed annually • $1,399/month if monthly</div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700"><strong>5 users</strong> included</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700"><strong>10 active business cases</strong> at a time</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">Standard CRM integrations</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">Email & chat support</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">ROI dashboard & reporting</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">Value realization tracking</span>
-                  </div>
-                </div>
-                <Button className="w-full text-lg py-3 font-semibold">
-                  Start 14-Day Free Trial
-                </Button>
-                <div className="text-center mt-4">
-                  <div className="text-sm text-green-600 font-medium">Pays for itself with 1.2 additional deals</div>
-                  <div className="text-xs text-gray-500 mt-1">No credit card required</div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Scale Plan */}
-            <Card className="p-8 hover:shadow-xl transition-all duration-300 border-2 border-blue-200 relative bg-gradient-to-b from-blue-50/30 to-white">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-blue-600 text-white px-4 py-2 text-sm font-semibold">
-                  Most Popular
-                </Badge>
+            <div className="flex flex-col gap-3 sm:flex-row mt-8 items-center justify-center">
+              <div className="relative inline-block group rounded-full">
+                <button className="relative z-10 overflow-hidden transition-[transform] duration-150 ease-out active:scale-[0.98] text-white bg-neutral-900/60 border-white/20 border rounded-full pt-3 pr-6 pb-3 pl-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm">
+                  <span className="relative z-10 inline-flex items-center gap-2 font-semibold rounded-full">
+                    Start Your 14-Day Free Trial
+                    <ArrowUpRight className="h-4 w-4 transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </span>
+                  <span className="pointer-events-none absolute bottom-0 left-1/2 right-1/2 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-80 transition-[left,right] duration-500 ease-out group-hover:left-0 group-hover:right-0"></span>
+                </button>
+                <span className="pointer-events-none absolute -bottom-3 left-1/2 z-0 h-6 w-44 -translate-x-1/2 opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100" 
+                      style={{background: 'radial-gradient(60% 100% at 50% 50%, rgba(255,255,255,.55), rgba(255,255,255,.28) 35%, transparent 70%)', filter: 'blur(10px) saturate(120%)'}}></span>
               </div>
-              <CardHeader className="pb-6">
-                <div>
-                  <CardTitle className="text-2xl text-gray-900">Scale</CardTitle>
-                  <CardDescription className="text-gray-600 text-lg mt-2">
-                    For high-growth revenue teams
-                  </CardDescription>
-                </div>
-                <div className="mt-6">
-                  <span className="text-5xl font-bold text-gray-900">$2,799</span>
-                  <span className="text-gray-600 text-xl">/month</span>
-                  <div className="text-sm text-gray-500 mt-2">Billed annually • $3,299/month if monthly</div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700"><strong>25 users</strong> included</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700"><strong>Unlimited business cases</strong></span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">Advanced BI integrations</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">Priority support + CSM</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">Custom reporting & analytics</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">Advanced workflow automation</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">API access & webhooks</span>
-                  </div>
-                </div>
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-lg py-3 font-semibold">
-                  Start 14-Day Free Trial
-                </Button>
-                <div className="text-center mt-4">
-                  <div className="text-sm text-green-600 font-medium">Pays for itself with 2.1 additional deals</div>
-                  <div className="text-xs text-gray-500 mt-1">Setup assistance included</div>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Enterprise Plan */}
-            <Card className="p-8 hover:shadow-xl transition-all duration-300 relative">
-              <CardHeader className="pb-6">
-                <div>
-                  <CardTitle className="text-2xl text-gray-900">Enterprise</CardTitle>
-                  <CardDescription className="text-gray-600 text-lg mt-2">
-                    For global revenue operations
-                  </CardDescription>
-                </div>
-                <div className="mt-6">
-                  <span className="text-5xl font-bold text-gray-900">Custom</span>
-                  <div className="text-sm text-gray-500 mt-2">Volume discounts available</div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700"><strong>Unlimited users</strong></span>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <a href="#" className="group relative overflow-hidden leading-none transition-all duration-300 text-white bg-gray-800/50 border-gray-700 border rounded-full pt-3 pr-6 pb-3 pl-6 shadow-sm backdrop-blur cursor-pointer">
+                    <span className="absolute inset-0 -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out bg-white/5"></span>
+                    <span className="relative z-10 inline-flex items-center gap-2">
+                      <Calculator className="w-3.5 h-3.5" />
+                      Calculate Your ROI
+                    </span>
+                  </a>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-md bg-gray-900/95 border-gray-800 backdrop-blur-xl text-white">
+                  <DialogHeader>
+                    <DialogTitle className="text-white">ROI Calculator</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <Label className="text-white">Annual Recurring Revenue Target</Label>
+                      <div className="px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg">
+                        ${arrTarget[0].toLocaleString()}
+                      </div>
+                      <Slider
+                        value={arrTarget}
+                        onValueChange={setArrTarget}
+                        max={20000000}
+                        min={1000000}
+                        step={250000}
+                        className="w-full"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-white">Average Deal Size</Label>
+                      <div className="px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg">
+                        ${dealSize[0].toLocaleString()}
+                      </div>
+                      <Slider
+                        value={dealSize}
+                        onValueChange={setDealSize}
+                        max={200000}
+                        min={10000}
+                        step={5000}
+                        className="w-full"
+                      />
+                    </div>
+                    <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4">
+                      <h4 className="font-semibold text-blue-300 mb-2">Your ROI Projection</h4>
+                      <div className="space-y-1 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-300">Additional Revenue:</span>
+                          <span className="text-white font-medium">${additionalRevenue.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-300">Payback Period:</span>
+                          <span className="text-white font-medium">{paybackWeeks} weeks</span>
+                        </div>
+                        <div className="flex justify-between border-t border-blue-500/30 pt-2">
+                          <span className="text-gray-300">Annual ROI:</span>
+                          <span className="text-blue-300 font-bold">847%</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">SSO & advanced security</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">Custom ROI formulas</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">Dedicated customer success</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">White-label options</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">On-premise deployment</span>
-                  </div>
-                  <div className="flex items-start">
-                    <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">99.9% uptime SLA</span>
-                  </div>
-                </div>
-                <Button variant="outline" className="w-full text-lg py-3 border-gray-300 hover:border-gray-400 font-semibold">
-                  Contact Sales Team
-                </Button>
-                <div className="text-center mt-4">
-                  <div className="text-sm text-blue-600 font-medium">ROI guarantee included</div>
-                  <div className="text-xs text-gray-500 mt-1">Implementation assistance</div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                </DialogContent>
+              </Dialog>
+            </div>
 
-          {/* Pricing Footer */}
-          <div className="mt-16 text-center">
-            <div className="bg-gray-50 rounded-xl p-8 max-w-4xl mx-auto">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                All plans include a 14-day free trial with full access
-              </h3>
-              <p className="text-gray-600 text-lg mb-6">
-                No credit card required. Cancel anytime. Switch plans as you grow.
-              </p>
-              <div className="grid md:grid-cols-3 gap-6 text-sm">
-                <div className="flex items-center justify-center">
-                  <Shield className="w-4 h-4 text-green-500 mr-2" />
-                  <span>Enterprise security included</span>
-                </div>
-                <div className="flex items-center justify-center">
-                  <Clock className="w-4 h-4 text-blue-500 mr-2" />
-                  <span>30-minute setup time</span>
-                </div>
-                <div className="flex items-center justify-center">
-                  <Award className="w-4 h-4 text-purple-500 mr-2" />
-                  <span>99.9% uptime guarantee</span>
-                </div>
+            <div className="mt-8 flex flex-col items-center gap-5 sm:flex-row sm:justify-center">
+              <div className="flex -space-x-2">
+                <img className="h-9 w-9 rounded-full ring-2 ring-gray-800 object-cover" 
+                     src="https://images.unsplash.com/photo-1494790108755-2616b5c1c6dd?w=60&h=60&fit=crop&crop=face" />
+                <img className="h-9 w-9 rounded-full ring-2 ring-gray-800 object-cover" 
+                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=60&h=60&fit=crop&crop=face" />
+                <img className="h-9 w-9 rounded-full ring-2 ring-gray-800 object-cover" 
+                     src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=60&h=60&fit=crop&crop=face" />
+              </div>
+              <div className="flex gap-2 text-sm font-medium text-gray-400 items-center">
+                <Shield className="w-4 h-4" />
+                Managing $8.7B in active pipeline
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Customer Success Stories */}
-      <section id="customers" className="bg-gray-50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Real Results from Real Revenue Leaders
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              See how B2BValue has transformed revenue operations at high-growth B2B companies
-            </p>
-          </div>
-
-          <div className="relative max-w-5xl mx-auto">
-            <Card className="p-8 lg:p-12 shadow-xl">
-              <CardContent>
-                <div className="grid lg:grid-cols-5 gap-8 items-center">
-                  {/* Testimonial Image */}
-                  <div className="lg:col-span-1 text-center lg:text-left">
-                    <img 
-                      src={testimonials[currentTestimonial].photo}
-                      alt={testimonials[currentTestimonial].person}
-                      className="w-20 h-20 rounded-full mx-auto lg:mx-0 mb-4 object-cover"
-                    />
-                    <div className="text-sm text-gray-500">
-                      {testimonials[currentTestimonial].industry} • {testimonials[currentTestimonial].companySize}
-                    </div>
-                  </div>
-                  
-                  {/* Testimonial Content */}
-                  <div className="lg:col-span-4">
-                    <Quote className="w-8 h-8 text-gray-300 mb-4" />
-                    <blockquote className="text-xl lg:text-2xl text-gray-700 mb-6 leading-relaxed">
-                      "{testimonials[currentTestimonial].quote}"
-                    </blockquote>
-                    
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <div className="font-semibold text-lg text-gray-900">
-                          {testimonials[currentTestimonial].person}
-                        </div>
-                        <div className="text-gray-600">
-                          {testimonials[currentTestimonial].title}
-                        </div>
-                        <div className="flex items-center mt-2">
-                          <span className="text-2xl mr-2">{testimonials[currentTestimonial].logo}</span>
-                          <span className="font-medium text-gray-900">{testimonials[currentTestimonial].company}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Badge className="bg-green-100 text-green-800 text-base px-3 py-1 block text-center">
-                          {testimonials[currentTestimonial].metrics}
-                        </Badge>
-                        <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
-                          <strong>Specific Result:</strong> {testimonials[currentTestimonial].specificResult}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+          {/* Partner logos */}
+          <div className="pt-6 pr-6 pb-6 pl-6 w-full">
+            <div className="text-center">
+              <p className="uppercase text-sm font-medium text-zinc-400 tracking-wide">
+                Trusted by revenue leaders at
+              </p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-6 mt-6 justify-items-center items-center opacity-60">
+              {['Salesforce', 'HubSpot', 'Stripe', 'Slack', 'Zoom', 'Shopify'].map((company) => (
+                <div key={company} className="h-[40px] w-[120px] bg-white/10 rounded flex items-center justify-center text-xs font-medium text-white/70">
+                  {company}
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Testimonial Navigation */}
-            <div className="flex justify-center mt-8 space-x-2">
-              {testimonials.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentTestimonial(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    index === currentTestimonial ? 'bg-blue-600 w-8' : 'bg-gray-300 hover:bg-gray-400'
-                  }`}
-                />
               ))}
             </div>
           </div>
 
-          {/* Results Grid */}
-          <div className="grid md:grid-cols-4 gap-8 mt-16">
-            <div className="text-center p-6 bg-white rounded-xl shadow-sm">
-              <div className="text-4xl font-bold text-blue-600 mb-2">400+</div>
-              <div className="text-gray-600">Revenue Leaders</div>
-            </div>
-            <div className="text-center p-6 bg-white rounded-xl shadow-sm">
-              <div className="text-4xl font-bold text-green-600 mb-2">$8.7B</div>
-              <div className="text-gray-600">Pipeline Value</div>
-            </div>
-            <div className="text-center p-6 bg-white rounded-xl shadow-sm">
-              <div className="text-4xl font-bold text-purple-600 mb-2">23pp</div>
-              <div className="text-gray-600">Avg Win Rate Lift</div>
-            </div>
-            <div className="text-center p-6 bg-white rounded-xl shadow-sm">
-              <div className="text-4xl font-bold text-orange-600 mb-2">156%</div>
-              <div className="text-gray-600">Avg NRR</div>
+          {/* Product Preview: Business Case Builder */}
+          <div className="relative sm:mt-16 my-48">
+            <div className="relative overflow-hidden bg-gray-900/70 border border-gray-800 rounded-3xl mx-0 sm:mx-8 lg:mx-24 shadow-xl backdrop-blur-xl">
+              <div className="p-6 sm:p-10">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gray-800 pb-6">
+                  <h3 className="text-2xl text-white font-bold tracking-tighter">AI-Powered Business Case Builder</h3>
+                  <Badge className="inline-flex items-center gap-2 text-xs text-gray-300 bg-gray-800/50 border border-gray-700 rounded-full px-2.5 py-1">
+                    <Bot className="w-3 h-3" />
+                    GPT-4 Powered
+                  </Badge>
+                </div>
+
+                <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* ROI Modeling */}
+                  <div className="relative rounded-2xl border border-gray-800 bg-gray-900/60 ring-1 ring-inset ring-gray-700/50 overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800">
+                      <span className="text-sm font-medium text-gray-200">Instant ROI Modeling</span>
+                      <Badge className="inline-flex items-center gap-1.5 text-xs font-medium text-blue-300 bg-blue-500/10 border border-blue-500/20 rounded-full px-2 py-0.5">
+                        <BarChart3 className="w-3 h-3" />
+                        Live Data
+                      </Badge>
+                    </div>
+                    <div className="px-3 py-3 space-y-3">
+                      <div className="rounded-lg bg-gray-950/70 border border-gray-800 p-3">
+                        <div className="text-xs text-gray-300 leading-relaxed space-y-1">
+                          <div className="flex justify-between">
+                            <span>Revenue Lift:</span>
+                            <span className="text-green-400">+$2.1M</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Cost Savings:</span>
+                            <span className="text-green-400">$340K</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Risk Mitigation:</span>
+                            <span className="text-blue-400">$680K</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <div className="h-6 w-6 rounded-full bg-blue-500/20 border border-blue-500/30 flex items-center justify-center">
+                          <Target className="w-3 h-3 text-blue-300" />
+                        </div>
+                        <div className="flex-1 rounded-lg bg-gray-800/50 border border-gray-700 p-2 text-xs text-gray-200">
+                          Pulling data from CRM to quantify deal impact in real-time
+                        </div>
+                      </div>
+                    </div>
+                    <div className="px-4 py-3 border-t border-gray-800 flex items-center gap-2 text-xs text-gray-400">
+                      <Brain className="w-3 h-3" />
+                      <span>67% faster deal approval</span>
+                    </div>
+                  </div>
+
+                  {/* Value Tracking */}
+                  <div className="relative rounded-2xl border border-gray-800 bg-gray-900/60 ring-1 ring-inset ring-gray-700/50 overflow-hidden">
+                    <div className="relative h-56">
+                      <div className="absolute inset-0 p-4">
+                        <div className="rounded-lg bg-gray-950/70 border border-gray-800 h-full overflow-hidden">
+                          <div className="px-3 py-2 border-b border-gray-800 flex items-center gap-2">
+                            <span className="h-3 w-3 rounded-full bg-green-500/70"></span>
+                            <span className="h-3 w-3 rounded-full bg-yellow-400/70"></span>
+                            <span className="h-3 w-3 rounded-full bg-red-500/70"></span>
+                            <span className="ml-2 text-xs text-gray-400">Value Dashboard</span>
+                          </div>
+                          <div className="p-3 text-xs leading-relaxed space-y-2">
+                            <div className="bg-green-500/10 border border-green-500/30 rounded p-2">
+                              <div className="text-green-300 font-medium">Q4 Results</div>
+                              <div className="text-gray-300">142% NRR • $4.2M ARR</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="px-4 py-3 border-t border-gray-800 flex items-center gap-2 text-xs text-gray-400">
+                      <TrendingUp className="w-3 h-3" />
+                      <span>Real-time value realization</span>
+                    </div>
+                  </div>
+
+                  {/* Automated Renewals */}
+                  <div className="relative rounded-2xl border border-gray-800 bg-gray-900/60 ring-1 ring-inset ring-gray-700/50 overflow-hidden">
+                    <div className="relative h-56">
+                      <div className="absolute inset-0 p-4 bg-gradient-to-br from-blue-500/5 to-purple-500/5">
+                        <div className="rounded-xl bg-gray-900/70 border border-gray-800 backdrop-blur p-3 shadow-sm w-40">
+                          <div className="flex items-center gap-2 text-xs font-medium text-gray-200">
+                            <Zap className="w-3 h-3" />
+                            Renewal Alert
+                          </div>
+                          <div className="mt-2 space-y-1.5">
+                            <div className="h-1.5 w-full rounded bg-green-600"></div>
+                            <div className="h-1.5 w-5/6 rounded bg-gray-700"></div>
+                            <div className="h-1.5 w-2/3 rounded bg-gray-800"></div>
+                          </div>
+                          <div className="mt-3 inline-flex items-center gap-1 text-xs text-gray-200 bg-green-600/20 border border-green-500/30 rounded-md px-2 py-1">
+                            <CheckCircle className="w-3 h-3" />
+                            340% ROI
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="px-4 py-3 border-t border-gray-800 flex items-center gap-2 text-xs text-gray-400">
+                      <Users className="w-3 h-3" />
+                      <span>Automated expansion plays</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 pt-8 border-t border-gray-800 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div>
+                    <h4 className="text-lg font-medium tracking-tight text-white">30-minute setup</h4>
+                    <p className="mt-2 text-sm text-gray-400">Connect your CRM and BI tools to start building cases immediately.</p>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-medium tracking-tight text-white">Executive-ready output</h4>
+                    <p className="mt-2 text-sm text-gray-400">AI writes compelling narratives that CFOs and boards approve.</p>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-medium tracking-tight text-white">Continuous tracking</h4>
+                    <p className="mt-2 text-sm text-gray-400">Monitor value realization with embedded checkpoints and alerts.</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Security & Compliance */}
-      <section id="security" className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-5xl font-bold text-gray-900 mb-6">
-              Enterprise-Grade Security You Can Trust
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Your sensitive business data deserves the highest levels of protection. 
-              We maintain certifications that meet the most stringent enterprise requirements.
-            </p>
+          {/* Results & Testimonials */}
+          <div className="relative z-10 mt-16">
+            <div className="grid gap-12 lg:grid-cols-2 my-48">
+              {/* Results card */}
+              <div className="relative rounded-[36px] pt-5 pr-5 pb-5 pl-5">
+                <Card className="relative overflow-hidden bg-gray-900/70 border-gray-800 rounded-3xl shadow-xl backdrop-blur-xl text-white">
+                  <CardHeader>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-gray-800">
+                      <CardTitle className="text-2xl text-white font-bold tracking-tighter">Proven Results</CardTitle>
+                      <Badge className="inline-flex items-center gap-2 text-xs text-gray-300 bg-gray-800/50 border border-gray-700 rounded-full px-2.5 py-1">
+                        <Gauge className="w-3 h-3" />
+                        Live metrics
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-6 mb-8">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-white mb-2">+17pp</div>
+                        <div className="text-sm text-gray-400">Enterprise win-rate uplift</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-white mb-2">&lt;30min</div>
+                        <div className="text-sm text-gray-400">To publish business case</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-white mb-2">130%</div>
+                        <div className="text-sm text-gray-400">Average Net Revenue Retention</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-white mb-2">23%</div>
+                        <div className="text-sm text-gray-400">Faster sales cycles</div>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-gray-800 pt-6">
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-400">Customer Success Score</span>
+                          <span className="text-white font-medium">4.8/5.0</span>
+                        </div>
+                        <div className="w-full bg-gray-800 rounded-full h-2">
+                          <div className="bg-blue-500 h-2 rounded-full" style={{width: '96%'}}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Testimonials */}
+              <div>
+                <h3 className="text-4xl sm:text-5xl text-white font-bold tracking-tighter">What revenue leaders are saying</h3>
+                <div className="mt-8 border-t border-gray-800 pt-6">
+                  <div className="bg-gray-900/60 border border-gray-800 rounded-2xl p-6 backdrop-blur-xl">
+                    <div className="flex items-start gap-4">
+                      <img 
+                        src={testimonials[currentIndex].avatar} 
+                        alt={testimonials[currentIndex].author}
+                        className="w-12 h-12 rounded-full object-cover ring-2 ring-gray-700"
+                      />
+                      <div className="flex-1">
+                        <blockquote className="text-gray-200 text-sm leading-relaxed mb-4">
+                          "{testimonials[currentIndex].quote}"
+                        </blockquote>
+                        <div>
+                          <cite className="text-white font-medium text-sm">
+                            {testimonials[currentIndex].author}
+                          </cite>
+                          <div className="text-gray-400 text-xs">
+                            {testimonials[currentIndex].title} • {testimonials[currentIndex].company}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center mt-4 gap-2">
+                    {testimonials.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentIndex(index)}
+                        className={`h-2 w-2 rounded-full transition-colors ${
+                          index === currentIndex ? 'bg-blue-500' : 'bg-gray-700'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            {trustIndicators.map((indicator, index) => (
-              <Card key={index} className="p-6 text-center hover:shadow-lg transition-all duration-300 group">
-                <indicator.icon className={`w-12 h-12 mx-auto mb-4 ${indicator.color} group-hover:scale-110 transition-transform`} />
-                <h3 className="font-semibold text-gray-900 mb-2 text-lg">{indicator.label}</h3>
-                <p className="text-gray-600 text-sm">
-                  {indicator.label === "SOC 2 Type II" && "Comprehensive security controls audited annually"}
-                  {indicator.label === "ISO 27001" && "International security management standards"}
-                  {indicator.label === "GDPR Compliant" && "European data privacy regulation adherence"}
-                  {indicator.label === "99.9% Uptime SLA" && "Enterprise-grade infrastructure reliability"}
-                </p>
+          {/* Pricing */}
+          <section className="sm:p-8 bg-gray-900/40 border-gray-800 border rounded-[36px] mt-16 mb-16 pt-6 pr-6 pb-6 pl-6 backdrop-blur-xl">
+            <div className="flex flex-col items-center text-center border-b border-gray-800 pb-8">
+              <Badge className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gray-800/50 border border-gray-700 text-gray-300">
+                <CreditCard className="w-3 h-3" />
+                <span className="text-xs font-normal">Pricing</span>
+              </Badge>
+              <h2 className="mt-4 text-[40px] sm:text-6xl lg:text-7xl leading-[0.95] text-white font-bold tracking-tighter">Scale with confidence</h2>
+              <p className="mt-2 text-sm sm:text-base text-gray-400">Transparent pricing that grows with your success.</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 max-w-7xl mt-8 mx-auto">
+              {/* Growth */}
+              <Card className="relative overflow-hidden p-5 sm:p-6 bg-gray-900/50 border border-gray-800 rounded-2xl backdrop-blur-xl text-white">
+                <CardHeader className="p-0">
+                  <div className="flex items-center justify-between text-xs text-gray-400 border-b border-gray-800/50 pb-4">
+                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-950/80 ring-1 ring-gray-700">01</span>
+                    <span className="inline-flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      Perfect for growing teams
+                    </span>
+                  </div>
+                  <div className="mt-5 flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-2xl sm:text-3xl text-white font-bold tracking-tighter">Growth</CardTitle>
+                      <CardDescription className="mt-1 text-sm text-gray-400">For Series A/B teams scaling fast.</CardDescription>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl sm:text-3xl text-white font-bold tracking-tighter">$1,199</p>
+                      <p className="text-xs text-gray-500">per month</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <button className="mt-5 inline-flex items-center justify-center gap-2 h-11 w-full rounded-full bg-white text-gray-900 text-sm font-medium hover:opacity-90 transition">
+                    Start Free Trial
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </button>
+                  <div className="mt-2 text-center">
+                    <p className="text-xs text-gray-500">Pays for itself with 1.2 deals</p>
+                  </div>
+                  <ul className="mt-6 space-y-3 text-sm border-t border-gray-800/50 pt-6">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-0.5 h-5 w-5 text-emerald-400" />
+                      5 users, 5 live business cases
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-0.5 h-5 w-5 text-emerald-400" />
+                      AI-powered ROI modeling
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-0.5 h-5 w-5 text-emerald-400" />
+                      CRM & BI integrations
+                    </li>
+                  </ul>
+                </CardContent>
               </Card>
-            ))}
-          </div>
 
-          {/* Additional Security Features */}
-          <div className="bg-gray-50 rounded-2xl p-8 lg:p-12">
-            <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">
-              Additional Security Features
-            </h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                <div>
-                  <div className="font-medium text-gray-900">Data Encryption</div>
-                  <div className="text-sm text-gray-600">AES-256 at rest, TLS 1.3 in transit</div>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                <div>
-                  <div className="font-medium text-gray-900">Access Controls</div>
-                  <div className="text-sm text-gray-600">Role-based permissions & SSO</div>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                <div>
-                  <div className="font-medium text-gray-900">Audit Logging</div>
-                  <div className="text-sm text-gray-600">Complete audit trail for all activities</div>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                <div>
-                  <div className="font-medium text-gray-900">Data Residency</div>
-                  <div className="text-sm text-gray-600">Choose your data location</div>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                <div>
-                  <div className="font-medium text-gray-900">Backup & Recovery</div>
-                  <div className="text-sm text-gray-600">Daily backups with 99.99% durability</div>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-3 mt-1 flex-shrink-0" />
-                <div>
-                  <div className="font-medium text-gray-900">Penetration Testing</div>
-                  <div className="text-sm text-gray-600">Quarterly third-party security assessments</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+              {/* Scale */}
+              <Card className="relative overflow-hidden p-5 sm:p-6 bg-gray-900/60 border border-gray-700 rounded-2xl shadow backdrop-blur-xl ring-1 ring-blue-500/20 text-white">
+                <CardHeader className="p-0">
+                  <div className="flex items-center justify-between text-xs text-gray-400 border-b border-gray-800/50 pb-4">
+                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-950/80 ring-1 ring-blue-500/30">02</span>
+                    <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30">Most Popular</Badge>
+                  </div>
+                  <div className="mt-5 flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-2xl sm:text-3xl text-white font-bold tracking-tighter">Scale</CardTitle>
+                      <CardDescription className="mt-1 text-sm text-gray-400">For high-growth revenue teams.</CardDescription>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl sm:text-3xl text-white font-bold tracking-tighter">$2,799</p>
+                      <p className="text-xs text-gray-500">per month</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <button className="mt-5 inline-flex items-center justify-center gap-2 h-11 w-full rounded-full bg-white text-gray-900 text-sm font-medium hover:opacity-90 transition">
+                    Start Free Trial
+                    <Zap className="w-3.5 h-3.5" />
+                  </button>
+                  <div className="mt-2 text-center">
+                    <p className="text-xs text-gray-500">ROI: 847% annually</p>
+                  </div>
+                  <ul className="mt-6 space-y-3 text-sm border-t border-gray-800/50 pt-6">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-0.5 h-5 w-5 text-emerald-400" />
+                      25 users, unlimited cases
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-0.5 h-5 w-5 text-emerald-400" />
+                      Advanced analytics & reporting
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-0.5 h-5 w-5 text-emerald-400" />
+                      Value realization tracking
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
 
-      {/* Final CTA */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl lg:text-5xl font-bold text-white mb-6 leading-tight">
-            Ready to Close 23% More Deals with Quantified Value?
-          </h2>
-          <p className="text-xl text-blue-100 mb-8 leading-relaxed max-w-3xl mx-auto">
-            Join 400+ revenue leaders who've transformed their sales process with data-driven business cases. 
-            Start your free trial today—no credit card required.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 text-xl px-10 py-5 font-semibold shadow-lg">
-              Start Your 14-Day Free Trial
-              <ArrowRight className="ml-2 w-6 h-6" />
-            </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 text-xl px-10 py-5 font-semibold">
-              Book a Personal Demo
-            </Button>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-6 text-blue-200 text-sm">
-            <div className="flex items-center justify-center">
-              <CheckCircle className="w-4 h-4 mr-2" />
-              <span>No credit card required</span>
+              {/* Enterprise */}
+              <Card className="relative overflow-hidden p-5 sm:p-6 bg-gray-900/50 border border-gray-800 rounded-2xl backdrop-blur-xl text-white">
+                <CardHeader className="p-0">
+                  <div className="flex items-center justify-between text-xs text-gray-400 border-b border-gray-800/50 pb-4">
+                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-950/80 ring-1 ring-gray-700">03</span>
+                    <span className="inline-flex items-center gap-1">
+                      <Building className="w-3 h-3" />
+                      Enterprise-grade
+                    </span>
+                  </div>
+                  <div className="mt-5 flex items-start justify-between">
+                    <div>
+                      <CardTitle className="text-2xl sm:text-3xl text-white font-bold tracking-tighter">Enterprise</CardTitle>
+                      <CardDescription className="mt-1 text-sm text-gray-400">For global organizations.</CardDescription>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl sm:text-3xl text-white font-bold tracking-tighter">Let's Talk</p>
+                      <p className="text-xs text-gray-500">custom pricing</p>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                  <button className="mt-5 inline-flex items-center justify-center gap-2 h-11 w-full rounded-full bg-gray-800/50 text-white text-sm font-medium hover:bg-gray-800/70 transition border border-gray-700">
+                    Book Demo
+                    <MessageSquare className="w-3.5 h-3.5" />
+                  </button>
+                  <ul className="mt-6 space-y-3 text-sm border-t border-gray-800/50 pt-6">
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-0.5 h-5 w-5 text-emerald-400" />
+                      SSO, custom ROI formulas, sandbox
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-0.5 h-5 w-5 text-emerald-400" />
+                      Dedicated CSM & 24/7 support
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <CheckCircle className="mt-0.5 h-5 w-5 text-emerald-400" />
+                      On-premise deployment options
+                    </li>
+                  </ul>
+                </CardContent>
+              </Card>
             </div>
-            <div className="flex items-center justify-center">
-              <CheckCircle className="w-4 h-4 mr-2" />
-              <span>Full platform access</span>
+
+            <div className="flex flex-col text-center mt-6 items-center border-t border-gray-800 pt-6">
+              <p className="text-xs text-gray-500">All plans include 14-day free trial • No credit card required • Full platform access</p>
             </div>
-            <div className="flex items-center justify-center">
-              <CheckCircle className="w-4 h-4 mr-2" />
-              <span>Setup in under 30 minutes</span>
-            </div>
-          </div>
+          </section>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-8">
-            <div className="lg:col-span-2">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                  <BarChart3 className="w-6 h-6 text-white" />
+      <footer className="pt-8">
+        <div className="border-t border-gray-800">
+          <div className="mx-auto max-w-7xl px-6 py-12">
+            <div className="grid gap-12 md:grid-cols-3">
+              <div className="flex flex-col gap-6">
+                <div className="flex flex-col leading-none">
+                  <span className="text-lg font-medium tracking-tight text-white">ValueArch</span>
+                  <span className="text-sm text-gray-400">Turn conversations into business cases</span>
                 </div>
-                <span className="text-2xl font-bold">B2BValue</span>
+
+                <div className="mt-4 space-y-2 text-gray-400 border-t border-gray-800 pt-6">
+                  <p className="text-sm">© 2024 ValueArch. All rights reserved.</p>
+                  <p className="text-xs text-gray-500">Trusted by 400+ revenue leaders managing $8.7B in pipeline.</p>
+                </div>
               </div>
-              <p className="text-gray-400 leading-relaxed mb-6 max-w-md">
-                Transforming how enterprise revenue teams quantify, track, and expand business value 
-                through AI-powered ROI modeling and value realization tracking.
-              </p>
-              <div className="flex space-x-4">
-                {trustIndicators.slice(0, 2).map((indicator, index) => (
-                  <div key={index} className="flex items-center text-sm text-gray-400">
-                    <indicator.icon className="w-4 h-4 mr-2" />
-                    <span>{indicator.label}</span>
+
+              <div className="grid grid-cols-2 gap-12 md:col-span-2">
+                <div className="space-y-8">
+                  <div>
+                    <h4 className="mb-4 text-sm font-medium tracking-tight text-white">Platform</h4>
+                    <ul className="space-y-3 text-sm text-gray-400">
+                      <li><a className="hover:text-white transition" href="#">ROI Calculator</a></li>
+                      <li><a className="hover:text-white transition" href="#">Business Cases</a></li>
+                      <li><a className="hover:text-white transition" href="#">Value Tracking</a></li>
+                      <li><a className="hover:text-white transition" href="#">Integrations</a></li>
+                    </ul>
                   </div>
-                ))}
+                </div>
+
+                <div className="space-y-8">
+                  <div>
+                    <h4 className="mb-4 text-sm font-medium tracking-tight text-white">Company</h4>
+                    <ul className="space-y-3 text-sm text-gray-400">
+                      <li><a className="hover:text-white transition" href="#">About</a></li>
+                      <li><a className="hover:text-white transition" href="#">Customers</a></li>
+                      <li><a className="hover:text-white transition" href="#">Security</a></li>
+                      <li><a className="hover:text-white transition" href="#">Careers</a></li>
+                    </ul>
+                  </div>
+                </div>
               </div>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4 text-lg">Platform</h3>
-              <ul className="space-y-3 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">ROI Calculator</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Value Tracking</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">CRM Integrations</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">API Documentation</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4 text-lg">Solutions</h3>
-              <ul className="space-y-3 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">For CFOs</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">For CROs</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">For Customer Success</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Enterprise</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold mb-4 text-lg">Company</h3>
-              <ul className="space-y-3 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <div className="text-gray-400 text-sm">
-              © 2025 B2BValue. All rights reserved.
-            </div>
-            <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Privacy Policy</a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Terms of Service</a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">Cookie Policy</a>
             </div>
           </div>
         </div>
       </footer>
+
+      <style jsx>{`
+        .button {
+          cursor: pointer;
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          transition: all 0.25s ease;
+          background: radial-gradient(65.28% 65.28% at 50% 100%,
+              rgba(99, 102, 241, 0.8) 0%,
+              rgba(99, 102, 241, 0) 100%),
+            linear-gradient(0deg, #4f46e5, #4f46e5);
+          border-radius: 9999px;
+          border: none;
+          outline: none;
+          padding: 8px 18px;
+          min-height: 36px;
+          min-width: 90px;
+        }
+
+        .button::before,
+        .button::after {
+          content: "";
+          position: absolute;
+          transition: all 0.5s ease-in-out;
+          z-index: 0;
+        }
+
+        .button::before {
+          inset: 1px;
+          background: linear-gradient(177.95deg,
+              rgba(255, 255, 255, 0.19) 0%,
+              rgba(255, 255, 255, 0) 100%);
+          border-radius: 9999px;
+        }
+
+        .button::after {
+          inset: 2px;
+          background: radial-gradient(65.28% 65.28% at 50% 100%,
+              rgba(99, 102, 241, 0.8) 0%,
+              rgba(99, 102, 241, 0) 100%),
+            linear-gradient(0deg, #4f46e5, #4f46e5);
+          border-radius: 9999px;
+        }
+
+        .button:active {
+          transform: scale(0.95);
+        }
+
+        .points_wrapper {
+          overflow: hidden;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          position: absolute;
+          z-index: 1;
+        }
+
+        .points_wrapper .point {
+          bottom: -8px;
+          position: absolute;
+          animation: floating-points infinite ease-in-out;
+          pointer-events: none;
+          width: 1.5px;
+          height: 1.5px;
+          background-color: #fff;
+          border-radius: 9999px;
+        }
+
+        @keyframes floating-points {
+          0% {
+            transform: translateY(0);
+          }
+          85% {
+            opacity: 0;
+          }
+          100% {
+            transform: translateY(-40px);
+            opacity: 0;
+          }
+        }
+
+        .points_wrapper .point:nth-child(1) {
+          left: 10%;
+          opacity: 1;
+          animation-duration: 2.35s;
+          animation-delay: 0.2s;
+        }
+
+        .points_wrapper .point:nth-child(2) {
+          left: 30%;
+          opacity: 0.7;
+          animation-duration: 2.5s;
+          animation-delay: 0.5s;
+        }
+
+        .points_wrapper .point:nth-child(3) {
+          left: 25%;
+          opacity: 0.8;
+          animation-duration: 2.2s;
+          animation-delay: 0.1s;
+        }
+
+        .points_wrapper .point:nth-child(4) {
+          left: 44%;
+          opacity: 0.6;
+          animation-duration: 2.05s;
+        }
+
+        .points_wrapper .point:nth-child(5) {
+          left: 50%;
+          opacity: 1;
+          animation-duration: 1.9s;
+        }
+
+        .points_wrapper .point:nth-child(6) {
+          left: 75%;
+          opacity: 0.5;
+          animation-duration: 1.5s;
+          animation-delay: 1.5s;
+        }
+
+        .points_wrapper .point:nth-child(7) {
+          left: 88%;
+          opacity: 0.9;
+          animation-duration: 2.2s;
+          animation-delay: 0.2s;
+        }
+
+        .points_wrapper .point:nth-child(8) {
+          left: 58%;
+          opacity: 0.8;
+          animation-duration: 2.25s;
+          animation-delay: 0.2s;
+        }
+
+        .points_wrapper .point:nth-child(9) {
+          left: 98%;
+          opacity: 0.6;
+          animation-duration: 2.6s;
+          animation-delay: 0.1s;
+        }
+
+        .points_wrapper .point:nth-child(10) {
+          left: 65%;
+          opacity: 1;
+          animation-duration: 2.5s;
+          animation-delay: 0.2s;
+        }
+
+        .inner {
+          z-index: 2;
+          gap: 5px;
+          position: relative;
+          width: 100%;
+          color: white;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
+          font-weight: 500;
+          line-height: 1.5;
+          transition: color 0.2s ease-in-out;
+        }
+      `}</style>
     </div>
   );
 }
