@@ -75,7 +75,7 @@ export default function Home() {
   const additionalRevenue = Math.round(arrTarget[0] * 0.17);
 
   return (
-    <div className="antialiased bg-gray-950 text-white min-h-screen" style={{fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial'}}>
+    <div className="antialiased bg-gray-950 text-white min-h-screen font-sans">
       {/* Background */}
       <div className="absolute top-0 w-full -z-10 h-[800px] blur-3xl bg-cover bg-center opacity-30" 
            style={{backgroundImage: 'url("https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=3840&h=800&fit=crop")'}}></div>
